@@ -1,0 +1,846 @@
+openapi: 3.0.0
+info:
+  title: JVN Chatbot API
+  version: 1.0.0
+  description: |
+    Johann von Neumann Chatbot API - A gamified chatbot system where users earn tokens by inspiring JVN through various activities, then spend those tokens to ask questions and receive mathematical wisdom.
+    
+    ## Core Concepts
+    
+    **Token Economy**: Users earn tokens (1-10 per activity) by successfully inspiring JVN. One token = 5 questions.
+    
+    **Mood System**: JVN's mood affects his responses and becomes pickier over time (goes from pleased to analytical to demanding to insufferable).
+    
+    **Birthday Celebrations**: Every 1000 interactions triggers a birthday mode with special rewards and easier token earning.
+    
+    **Philosophy Engine**: JVN occasionally shares mathematical wisdom based on his current mood and interaction count.
+
+  contact:
+    name: API Support
+    url: https://github.com/your-username/jvn-chatbot-api
+    email: a2z.tom@gmail.com
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: http://localhost:3000
+    description: Development server
+  - url: https://api.jvn-chatbot.com
+    description: Production server
+
+tags:
+  - name: inspiration
+    description: Activities to inspire JVN and earn tokens
+  - name: chatbot
+    description: JVN status and wisdom endpoints
+  - name: chat
+    description: Ask questions using earned tokens
+  - name: debug
+    description: Development and admin tools
+
+paths:
+  /inspire/fresh-air:
+    post:
+      tags:
+        - inspiration
+      summary: Take JVN outside for fresh air
+      description: |
+        Inspire JVN by taking him outside for fresh air and computational clarity. 
+        Success depends on JVN's current mood and satisfaction threshold.
+        
+        **Token Reward**: 1 token on success
+      operationId: inspireFreshAir
+      responses:
+        '200':
+          description: Inspiration attempt completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InspirationResponse'
+              examples:
+                success:
+                  summary: Successful inspiration
+                  value:
+                    success: true
+                    message: "Success"
+                    data:
+                      success: true
+                      tokens_earned: 1
+                      message: "Gut! Ze optimization parameters are within acceptable ranges!"
+                      jvn_mood: "pleased"
+                      global_token_pool: 15
+                      total_interactions: 23
+                      difficulty_level: 1
+                    meta:
+                      timestamp: "2025-01-15T10:30:00.000Z"
+                failure:
+                  summary: Failed inspiration
+                  value:
+                    success: true
+                    message: "Success"
+                    data:
+                      success: false
+                      tokens_earned: 0
+                      message: "Hmm, ze probability calculations suggest zis could be improved."
+                      jvn_mood: "pleased"
+                      global_token_pool: 15
+                      total_interactions: 24
+                      difficulty_level: 1
+                    meta:
+                      timestamp: "2025-01-15T10:30:00.000Z"
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /inspire/food:
+    post:
+      tags:
+        - inspiration
+      summary: Feed JVN different food levels
+      description: |
+        Provide food to optimize JVN's computational nutrition. Different food levels provide different token rewards.
+        
+        **Token Rewards**:
+        - snack: 1 token
+        - entree: 2 tokens  
+        - restaurant: 5 tokens
+      operationId: inspireFood
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - level
+              properties:
+                level:
+                  type: string
+                  enum: [snack, entree, restaurant]
+                  description: Food level determining token reward
+                  example: "snack"
+            examples:
+              snack:
+                summary: Give JVN a snack
+                value:
+                  level: "snack"
+              entree:
+                summary: Feed JVN an entree
+                value:
+                  level: "entree"
+              restaurant:
+                summary: Take JVN to a restaurant
+                value:
+                  level: "restaurant"
+      responses:
+        '200':
+          description: Food inspiration completed
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/InspirationResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          level:
+                            type: string
+                            description: Food level provided
+        '400':
+          description: Invalid food level
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                error:
+                  message: "Ze food level must be: snack (1 token), entree (2 tokens), or restaurant (5 tokens)"
+                  code: "INVALID_FOOD_LEVEL"
+                meta:
+                  timestamp: "2025-01-15T10:30:00.000Z"
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /inspire/joke:
+    post:
+      tags:
+        - inspiration
+      summary: Tell JVN a joke
+      description: |
+        Share humor with JVN to demonstrate proper understanding of comedic algorithms and irony theory.
+        
+        **Token Reward**: 1 token on success
+      operationId: inspireJoke
+      responses:
+        '200':
+          description: Joke inspiration completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InspirationResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /inspire/game:
+    post:
+      tags:
+        - inspiration
+      summary: Play a game with JVN
+      description: |
+        Engage JVN in game theory applications and strategic thinking exercises.
+        
+        **Token Reward**: 1 token on success
+      operationId: inspireGame
+      responses:
+        '200':
+          description: Game inspiration completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InspirationResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /inspire/physical-care:
+    post:
+      tags:
+        - inspiration
+      summary: Provide physical care to JVN
+      description: |
+        Apply therapeutic pressure points and biomechanical optimization protocols (scratching, grooming).
+        
+        **Token Reward**: 1 token on success
+      operationId: inspirePhysicalCare
+      responses:
+        '200':
+          description: Physical care inspiration completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InspirationResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /inspire/compliment:
+    post:
+      tags:
+        - inspiration
+      summary: Give JVN a compliment
+      description: |
+        Provide positive reinforcement to boost JVN's computational confidence.
+        
+        **Token Reward**: 1 token on success
+      operationId: inspireCompliment
+      responses:
+        '200':
+          description: Compliment inspiration completed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InspirationResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /inspire/birthday-cake:
+    post:
+      tags:
+        - inspiration
+      summary: Give JVN birthday cake (birthday mode only)
+      description: |
+        Present birthday kuchen during JVN's special birthday celebrations. Only available during birthday mode (every 1000 interactions).
+        
+        **Token Reward**: 10 tokens (always succeeds during birthday mode)
+      operationId: inspireBirthdayCake
+      responses:
+        '200':
+          description: Birthday cake successfully given
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/InspirationResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          special_event:
+                            type: string
+                            example: "birthday_cake"
+                          cake_pieces_eaten:
+                            type: integer
+                            description: Random number of cake pieces consumed
+                            example: 2
+                          birthday_wish:
+                            type: string
+                            example: "I wish for more friends who understand ze beauty of mathematics!"
+                          celebration_interactions_left:
+                            type: integer
+                            description: Remaining birthday celebration interactions
+        '400':
+          description: Not birthday mode
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                success: false
+                error:
+                  message: "Birthday kuchen can only be given during birthday celebrations!"
+                  code: "NOT_BIRTHDAY_MODE"
+                  next_birthday_in: 247
+                meta:
+                  timestamp: "2025-01-15T10:30:00.000Z"
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /chatbot/status:
+    get:
+      tags:
+        - chatbot
+      summary: Get JVN's current status
+      description: |
+        Retrieve comprehensive information about JVN's current state, mood, token pool, and interaction statistics.
+        
+        Includes birthday information if currently in birthday mode.
+      operationId: getChatbotStatus
+      responses:
+        '200':
+          description: JVN status information
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Success"
+                  data:
+                    $ref: '#/components/schemas/ChatbotStatus'
+                  meta:
+                    $ref: '#/components/schemas/ResponseMeta'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /chatbot/wisdom:
+    get:
+      tags:
+        - chatbot
+      summary: Get philosophical wisdom from JVN
+      description: |
+        Request mathematical and philosophical insights from JVN. Wisdom content depends on JVN's current mood and interaction count.
+        
+        Different rarities available: common, uncommon, rare
+      operationId: getChatbotWisdom
+      responses:
+        '200':
+          description: Philosophical wisdom or unavailable message
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Success"
+                  data:
+                    oneOf:
+                      - $ref: '#/components/schemas/PhilosophyWisdom'
+                      - $ref: '#/components/schemas/WisdomUnavailable'
+                  meta:
+                    $ref: '#/components/schemas/ResponseMeta'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /chat/ask-question:
+    post:
+      tags:
+        - chat
+      summary: Ask JVN a question using tokens
+      description: |
+        Submit questions to JVN using earned tokens. Each token provides 5 questions.
+        
+        **Token Usage**: 1 token = 5 questions
+        
+        JVN's response style varies based on his current mood and may include bonus philosophical moments.
+      operationId: askQuestion
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - question
+              properties:
+                question:
+                  type: string
+                  description: The question to ask JVN
+                  minLength: 1
+                  example: "What is the meaning of mathematics?"
+            examples:
+              math_question:
+                summary: Mathematical question
+                value:
+                  question: "What makes mathematics beautiful?"
+              philosophy_question:
+                summary: Philosophical question
+                value:
+                  question: "How does logic guide decision making?"
+      responses:
+        '200':
+          description: JVN's response to the question
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Success"
+                  data:
+                    $ref: '#/components/schemas/QuestionResponse'
+                  meta:
+                    $ref: '#/components/schemas/ResponseMeta'
+        '400':
+          description: Invalid question or no tokens available
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                no_tokens:
+                  summary: No tokens available
+                  value:
+                    success: false
+                    error:
+                      message: "No tokens available! Please inspire JVN to earn tokens first."
+                      code: "NO_TOKENS_AVAILABLE"
+                      global_token_pool: 0
+                      suggestion: "Try POST /inspire/fresh-air or other inspiration endpoints!"
+                    meta:
+                      timestamp: "2025-01-15T10:30:00.000Z"
+                missing_question:
+                  summary: Missing question parameter
+                  value:
+                    success: false
+                    error:
+                      message: "Ze question parameter is required for mathematical discourse!"
+                      code: "MISSING_QUESTION"
+                    meta:
+                      timestamp: "2025-01-15T10:30:00.000Z"
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /debug/reset:
+    post:
+      tags:
+        - debug
+      summary: Reset JVN to initial state
+      description: |
+        **Development Only**: Completely reset JVN's state, clearing all interaction history, tokens, and statistics. Reinitializes database with fresh state.
+        
+        This endpoint should only be used in development environments.
+      operationId: resetChatbot
+      responses:
+        '200':
+          description: JVN successfully reset
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Success"
+                  data:
+                    type: object
+                    properties:
+                      message:
+                        type: string
+                        example: "JVN has been reset to initial state!"
+                      status:
+                        type: string
+                        example: "Ze mathematical universe has been reinitialized!"
+                  meta:
+                    $ref: '#/components/schemas/ResponseMeta'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /:
+    get:
+      tags:
+        - chatbot
+      summary: Get API information and available endpoints
+      description: |
+        Root endpoint providing API overview, available endpoints, and JVN's greeting message.
+      operationId: getApiInfo
+      responses:
+        '200':
+          description: API information
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Welcome to ze JVN Chatbot API!"
+                  description:
+                    type: string
+                    example: "Johann von Neumann awaits your mathematical inspiration!"
+                  documentation:
+                    type: string
+                    example: "/api-docs"
+                  version:
+                    type: string
+                    example: "1.0.0"
+                  endpoints:
+                    type: object
+                    properties:
+                      inspiration:
+                        type: array
+                        items:
+                          type: string
+                        example: ["POST /inspire/fresh-air", "POST /inspire/food"]
+                      interaction:
+                        type: array
+                        items:
+                          type: string
+                        example: ["GET /chatbot/status", "POST /chat/ask-question"]
+                      debug:
+                        type: array
+                        items:
+                          type: string
+                        example: ["POST /debug/reset"]
+                  jvn_says:
+                    type: string
+                    example: "Guten Tag! I am ready to be inspired by your mathematical brilliance!"
+
+components:
+  schemas:
+    InspirationResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: Whether the API call was successful
+        message:
+          type: string
+          example: "Success"
+        data:
+          type: object
+          properties:
+            success:
+              type: boolean
+              description: Whether JVN was successfully inspired
+            tokens_earned:
+              type: integer
+              minimum: 0
+              description: Number of tokens earned (0 if failed)
+            message:
+              type: string
+              description: JVN's response message in German-accented English
+              example: "Ausgezeichnet! Ze mathematical elegance pleases me greatly!"
+            jvn_mood:
+              type: string
+              enum: [pleased, analytical, slightly_annoyed, demanding, insufferable, ecstatic]
+              description: JVN's current mood
+            global_token_pool:
+              type: integer
+              minimum: 0
+              description: Total tokens available for asking questions
+            total_interactions:
+              type: integer
+              minimum: 0
+              description: Total number of inspiration attempts
+            difficulty_level:
+              type: integer
+              minimum: 1
+              maximum: 10
+              description: Current satisfaction threshold (higher = pickier)
+            special_event:
+              type: string
+              description: Special event if applicable (e.g., "birthday")
+              example: "birthday"
+            birthday_number:
+              type: integer
+              description: Birthday number if in birthday mode
+            celebration_interactions_left:
+              type: integer
+              description: Remaining birthday celebration interactions
+            philosophical_moment:
+              type: boolean
+              description: Whether philosophical wisdom was triggered
+            jvn_wisdom:
+              type: string
+              description: Philosophical quote if triggered
+              example: "Ze most beautiful theorems are like symphonies - elegant, surprising, and utterly logical in their construction."
+        meta:
+          $ref: '#/components/schemas/ResponseMeta'
+
+    ChatbotStatus:
+      type: object
+      properties:
+        jvn_mood:
+          type: string
+          enum: [pleased, analytical, slightly_annoyed, demanding, insufferable, ecstatic]
+          description: JVN's current mood state
+          example: "pleased"
+        global_token_pool:
+          type: integer
+          minimum: 0
+          description: Total tokens available for questions
+          example: 15
+        total_interactions:
+          type: integer
+          minimum: 0
+          description: Total inspiration attempts made
+          example: 47
+        successful_interactions:
+          type: integer
+          minimum: 0
+          description: Number of successful inspirations
+          example: 32
+        success_rate_percentage:
+          type: integer
+          minimum: 0
+          maximum: 100
+          description: Success rate as percentage
+          example: 68
+        current_difficulty_level:
+          type: integer
+          minimum: 1
+          maximum: 10
+          description: Current satisfaction threshold (1=easy, 10=impossible)
+          example: 2
+        questions_remaining:
+          type: integer
+          minimum: 0
+          description: Questions remaining from current token
+          example: 3
+        total_questions_asked:
+          type: integer
+          minimum: 0
+          description: Total questions asked throughout history
+          example: 127
+        interactions_until_next_birthday:
+          type: integer
+          minimum: 0
+          maximum: 999
+          description: Interactions needed until next birthday celebration
+          example: 953
+        total_birthdays_celebrated:
+          type: integer
+          minimum: 0
+          description: Number of birthday celebrations completed
+          example: 0
+        special_event:
+          type: string
+          description: Current special event if any
+          example: "birthday"
+        birthday_number:
+          type: integer
+          description: Current birthday number if in birthday mode
+          example: 1
+        celebration_interactions_left:
+          type: integer
+          description: Remaining birthday celebration interactions
+          example: 32
+        birthday_message:
+          type: string
+          description: Special birthday message if in birthday mode
+          example: "It's my 1st birthday! Ze mathematical universe celebrates!"
+
+    PhilosophyWisdom:
+      type: object
+      properties:
+        jvn_wisdom:
+          type: string
+          description: Philosophical quote or insight
+          example: "In ze end, all knowledge reduces to pattern recognition and logical inference."
+        wisdom_category:
+          type: string
+          description: Category of wisdom
+          example: "universal_truth"
+        jvn_mood:
+          type: string
+          description: JVN's mood when providing wisdom
+          example: "contemplative"
+        wisdom_rarity:
+          type: string
+          enum: [common, uncommon, rare]
+          description: Rarity level of this wisdom
+          example: "rare"
+        times_shared:
+          type: integer
+          description: Number of times this wisdom has been shared
+          example: 3
+        philosophical_consultation:
+          type: boolean
+          example: true
+
+    WisdomUnavailable:
+      type: object
+      properties:
+        jvn_mood:
+          type: string
+          description: JVN's current mood
+        message:
+          type: string
+          example: "Ze philosophical subroutines are temporarily offline. Please try again later!"
+        wisdom_available:
+          type: boolean
+          example: false
+
+    QuestionResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        jvn_response:
+          type: string
+          description: JVN's response to the question
+          example: "Ah, an interesting question! Let me apply my mathematical reasoning..."
+        your_question:
+          type: string
+          description: The question that was asked
+          example: "What is the meaning of mathematics?"
+        jvn_mood:
+          type: string
+          enum: [pleased, analytical, slightly_annoyed, demanding, insufferable, ecstatic]
+          description: JVN's mood when answering
+          example: "pleased"
+        questions_remaining:
+          type: integer
+          description: Questions remaining from current token
+          example: 4
+        global_token_pool:
+          type: integer
+          description: Total tokens available
+          example: 12
+        total_questions_asked:
+          type: integer
+          description: Total questions asked in conversation history
+          example: 128
+        bonus_wisdom:
+          type: boolean
+          description: Whether bonus philosophical wisdom was included
+        jvn_wisdom:
+          type: string
+          description: Bonus philosophical wisdom if triggered
+          example: "Every equation tells a story. Ze art is learning to read ze narrative hidden in ze symbols."
+
+    ErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: object
+          properties:
+            message:
+              type: string
+              description: Human-readable error message
+            code:
+              type: string
+              description: Machine-readable error code
+        meta:
+          $ref: '#/components/schemas/ResponseMeta'
+
+    ResponseMeta:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+          description: ISO 8601 timestamp of response
+          example: "2025-01-15T10:30:00.000Z"
+
+  responses:
+    InternalServerError:
+      description: Internal server error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          example:
+            success: false
+            error:
+              message: "Ach! A computational catastrophe occurred!"
+              code: "INTERNAL_SERVER_ERROR"
+            meta:
+              timestamp: "2025-01-15T10:30:00.000Z"
+
+  examples:
+    SuccessfulInspiration:
+      summary: JVN is pleased
+      value:
+        success: true
+        message: "Success"
+        data:
+          success: true
+          tokens_earned: 1
+          message: "Wunderbar! Zis demonstrates proper algorithmic thinking!"
+          jvn_mood: "pleased"
+          global_token_pool: 16
+          total_interactions: 24
+          difficulty_level: 1
+        meta:
+          timestamp: "2025-01-15T10:30:00.000Z"
+
+    FailedInspiration:
+      summary: JVN is not impressed
+      value:
+        success: true
+        message: "Success"
+        data:
+          success: false
+          tokens_earned: 0
+          message: "Ze computational logic is flawed. Please recalibrate your approach."
+          jvn_mood: "analytical"
+          global_token_pool: 15
+          total_interactions: 25
+          difficulty_level: 2
+        meta:
+          timestamp: "2025-01-15T10:30:00.000Z"
+
+    BirthdayModeStatus:
+      summary: JVN in birthday celebration mode
+      value:
+        success: true
+        message: "Success"
+        data:
+          jvn_mood: "ecstatic"
+          global_token_pool: 87
+          total_interactions: 1000
+          successful_interactions: 743
+          success_rate_percentage: 74
+          current_difficulty_level: 0
+          questions_remaining: 2
+          total_questions_asked: 1247
+          interactions_until_next_birthday: 1000
+          total_birthdays_celebrated: 1
+          special_event: "birthday"
+          birthday_number: 1
+          celebration_interactions_left: 37
+          birthday_message: "It's my 1st birthday! Ze mathematical universe celebrates!"
+        meta:
+          timestamp: "2025-01-15T10:30:00.000Z"
